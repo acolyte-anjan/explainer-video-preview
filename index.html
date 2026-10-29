@@ -1,0 +1,467 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Workspace to Composer Review</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a review desk. The video stays pinned on the left while the timestamped script scrolls on the right; stacked on phones. */
+:root {
+  --bg: #f6f8f9; --surface: #ffffff; --ink: #2f4152; --muted: #5b6b79; --line: #dde4e8;
+  --teal: #388083; --teal-fill: #3ea6ac; --teal-soft: rgba(62,166,172,0.10);
+  --rose: #b24e78; --rose-fill: #c6658c; --rose-soft: rgba(198,101,140,0.10);
+  --now: #fff6dc; --now-edge: #e2b84c;
+  --display: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121a20; --surface: #1a252d; --ink: #e3eaee; --muted: #9fb0bc; --line: #2b3a44;
+  --teal: #6cc6cb; --teal-fill: #3ea6ac; --teal-soft: rgba(62,166,172,0.16);
+  --rose: #e595b6; --rose-fill: #c6658c; --rose-soft: rgba(198,101,140,0.18);
+  --now: #2d2a1a; --now-edge: #b9923a; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121a20; --surface: #1a252d; --ink: #e3eaee; --muted: #9fb0bc; --line: #2b3a44;
+  --teal: #6cc6cb; --teal-fill: #3ea6ac; --teal-soft: rgba(62,166,172,0.16);
+  --rose: #e595b6; --rose-fill: #c6658c; --rose-soft: rgba(198,101,140,0.18);
+  --now: #2d2a1a; --now-edge: #b9923a; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font: 16px/1.55 var(--body); }
+.wrap { max-width: 1440px; margin: 0 auto; padding-block: 28px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { display: grid; gap: 6px; margin-bottom: 22px; }
+.eyebrow { font: 600 12px/1.2 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--teal); }
+.eyebrow b { color: var(--rose); font-weight: 700; }
+h1 { font: 700 clamp(26px, 3.2vw, 36px)/1.15 var(--display); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+.sub { color: var(--muted); max-width: 70ch; margin: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.chip { font: 600 12px/1 var(--display); padding: 7px 10px; border-radius: 100px; background: var(--teal-soft); color: var(--teal); }
+.chip.rose { background: var(--rose-soft); color: var(--rose); }
+
+.desk { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+@media (max-width: 960px) { .desk { grid-template-columns: minmax(0, 1fr); } }
+.stage { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 12px; min-width: 0; }
+@media (max-width: 960px) { .stage { position: static; } }
+.player { background: #0d1418; border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 9; max-width: 100%; border: 1px solid var(--line); }
+.player video { display: block; width: 100%; height: 100%; }
+.now { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.now .tc { font: 500 14px/1 var(--mono); color: var(--teal); font-variant-numeric: tabular-nums; }
+.now .what { flex: 1 1 200px; min-width: 0; font: 600 14px/1.3 var(--display); }
+.now .what span { display: block; font: 400 13px/1.3 var(--body); color: var(--muted); }
+button { font: 600 13px/1 var(--display); border-radius: 8px; cursor: pointer; padding: 9px 12px; border: 1px solid transparent; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--teal-fill); outline-offset: 2px; }
+.primary { background: var(--rose-fill); color: #fff; }
+.primary:hover { filter: brightness(1.06); }
+.ghost { background: transparent; color: var(--teal); border-color: var(--line); }
+.ghost:hover { background: var(--teal-soft); }
+.how { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 14px; color: var(--muted); }
+.how h2 { font: 700 13px/1.2 var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--ink); margin: 0 0 8px; }
+.how ol { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+.how a { color: var(--teal); }
+
+.script { min-width: 0; display: grid; gap: 22px; }
+.tools { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.tools h2 { font: 700 20px/1.2 var(--display); margin: 0; }
+.tools label { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); cursor: pointer; }
+.phase h3 { display: flex; align-items: baseline; gap: 10px; font: 700 12px/1.2 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--teal); margin: 0 0 8px; }
+.phase.composer h3 { color: var(--rose); }
+.phase h3 small { font: 400 13px/1.2 var(--body); letter-spacing: 0; text-transform: none; color: var(--muted); }
+.lines { display: grid; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; }
+.ln { display: grid; grid-template-columns: 66px minmax(0, 1fr) auto; gap: 4px 12px; padding: 14px 14px 14px 10px; border-top: 1px solid var(--line); border-left: 3px solid transparent; transition: background .2s; }
+.ln:first-child { border-top: 0; }
+.ln.active { background: var(--now); border-left-color: var(--now-edge); }
+.ts { align-self: start; font: 500 13px/1 var(--mono); font-variant-numeric: tabular-nums; color: var(--teal); background: var(--teal-soft); padding: 7px 6px; border-radius: 6px; text-align: center; }
+.ts:hover { background: var(--teal-fill); color: #fff; }
+.body { min-width: 0; }
+.sec { font: 600 13px/1.3 var(--display); color: var(--ink); }
+.sec em { font-style: normal; font-weight: 500; color: var(--muted); }
+.vo { margin: 4px 0 0; font-size: 16.5px; line-height: 1.55; max-width: 65ch; }
+.screen { margin-top: 6px; font-size: 13px; color: var(--muted); }
+.screen b { font-weight: 600; color: var(--rose); }
+.cbtn { align-self: start; background: transparent; color: var(--muted); border: 1px solid var(--line); padding: 7px 10px; }
+.cbtn:hover { color: var(--rose); border-color: var(--rose-fill); background: var(--rose-soft); }
+@media (max-width: 520px) { .ln { grid-template-columns: 58px minmax(0, 1fr); } .cbtn { grid-column: 2; justify-self: start; } }
+
+.questions .lines { border-color: var(--rose-soft); }
+.q { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; padding: 14px; border-top: 1px solid var(--line); }
+.q:first-child { border-top: 0; }
+.q p { margin: 0; font-size: 15px; max-width: 70ch; }
+.q p b { font-family: var(--display); font-weight: 600; font-size: 14px; display: block; margin-bottom: 2px; }
+
+/* suggested edits */
+.acts { align-self: start; display: flex; flex-direction: column; gap: 6px; }
+@media (max-width: 520px) { .acts { grid-column: 2; flex-direction: row; } }
+.ebtn { background: transparent; color: var(--teal); border: 1px solid var(--line); padding: 7px 10px; }
+.ebtn:hover { background: var(--teal-soft); border-color: var(--teal-fill); }
+.editor { grid-column: 2 / -1; display: grid; gap: 8px; margin-top: 6px; }
+.editor label { font: 600 12px/1.2 var(--display); color: var(--muted); }
+.editor textarea, .editor input { font: 16px/1.5 var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; width: 100%; box-sizing: border-box; }
+.editor textarea { min-height: 96px; resize: vertical; }
+.editor textarea:focus, .editor input:focus { outline: 2px solid var(--teal-fill); outline-offset: 0; }
+.editor .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.editor .hint { font-size: 13px; color: var(--muted); }
+.sugs { grid-column: 2 / -1; display: grid; gap: 8px; }
+.sugs:empty { display: none; }
+.sug { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--bg); display: grid; gap: 6px; }
+.sug.accepted { border-color: var(--teal-fill); }
+.sug.declined { opacity: .62; }
+.who { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 13px; color: var(--muted); }
+.who img { width: 20px; height: 20px; border-radius: 50%; }
+.who b { color: var(--ink); font: 600 13px/1.2 var(--display); }
+.st { font: 600 11px/1 var(--display); letter-spacing: .06em; text-transform: uppercase; padding: 5px 7px; border-radius: 100px; background: var(--now); color: var(--ink); }
+.st.accepted { background: var(--teal-soft); color: var(--teal); }
+.st.declined { background: var(--line); color: var(--muted); }
+.diff { margin: 0; font-size: 15.5px; line-height: 1.6; max-width: 65ch; }
+.diff del { color: var(--rose); text-decoration: line-through; text-decoration-thickness: 1.5px; background: var(--rose-soft); border-radius: 3px; padding: 0 2px; }
+.diff ins { color: var(--teal); text-decoration: none; background: var(--teal-soft); border-bottom: 2px solid var(--teal-fill); border-radius: 3px; padding: 0 2px; }
+.why { font-size: 14px; color: var(--muted); margin: 0; }
+.why::before { content: "Why: "; font-weight: 600; color: var(--ink); }
+.own { display: flex; flex-wrap: wrap; gap: 6px; }
+.own button { padding: 6px 10px; }
+.ok { background: var(--teal-fill); color: #fff; }
+.no { background: transparent; color: var(--muted); border-color: var(--line); }
+.ln.has-sug .ts { box-shadow: inset 0 0 0 2px var(--rose-fill); }
+.views { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+.views button { border-radius: 0; background: transparent; color: var(--muted); padding: 8px 12px; }
+.views button[aria-pressed="true"] { background: var(--teal-soft); color: var(--teal); }
+.count { display: inline-block; min-width: 18px; padding: 2px 5px; margin-left: 4px; border-radius: 100px; background: var(--rose-fill); color: #fff; font-size: 11px; }
+.access { font-size: 14px; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; margin: 0; }
+.chg { display: grid; gap: 14px; }
+.chg .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 14px; color: var(--muted); }
+.chg select { font: 14px var(--body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; }
+.chg .item { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 8px; }
+.chg .item .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.chg .item .top .sec { display: flex; gap: 8px; align-items: center; }
+.chg .orig { margin: 0; font-size: 13px; color: var(--muted); }
+.chg .orig::before { content: "Original: "; font-weight: 600; }
+.empty { color: var(--muted); font-size: 15px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin: 0; }
+.selbtn { position: absolute; z-index: 5; box-shadow: 0 6px 18px rgba(20,30,40,.22); }
+.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); transform: translateX(-50%); background: var(--ink); color: var(--bg); font: 600 13px/1.3 var(--display); padding: 10px 14px; border-radius: 8px; max-width: calc(100% - 32px); }
+@media (prefers-reduced-motion: reduce) { .ln { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Acolyte <b>AI</b> · Explainer review · v5</div>
+    <h1>Workspace to Composer, intake to enrollment-ready</h1>
+    <p class="sub">A 4:55 walkthrough using the demo client ABC Catering. Watch the cut, then leave comments on the exact lines you'd change. Everyone you share this page with sees the same comment threads.</p>
+    <div class="meta"><span class="chip">4:55 · 23 lines</span><span class="chip">Voice: ElevenLabs v4</span><span class="chip rose">Music: "Dreamwalking," Rocket Jr (Epidemic Sound)</span></div>
+  </header>
+
+  <div class="desk">
+    <section class="stage" data-uncommentable>
+      <div class="player"><video id="vid" controls playsinline preload="metadata" poster="poster.jpg"></video></div>
+      <div class="now" aria-live="polite">
+        <span class="tc" id="now-tc">0:00</span>
+        <div class="what" id="now-what">Intro<span>Press play, or click any timestamp in the script.</span></div>
+        <button class="primary" id="comment-now" type="button">Comment at this moment</button>
+      </div>
+      <div class="how">
+        <h2>How to review</h2>
+        <ol>
+          <li>Click a timestamp to jump the video to that line.</li>
+          <li>Use <b>Comment</b> on a line, or select any words in the script and choose <b>Comment on selection</b>.</li>
+          <li>Pause anywhere and use <b>Comment at this moment</b>; it attaches to the line being spoken.</li>
+          <li>To rewrite a line, use <b>Suggest edit</b>. The original stays put; your version shows as a redline with your name, and everyone's changes are listed under <b>Changes</b>.</li>
+        </ol>
+        <p style="margin:10px 0 0">Video won't play? <a href="https://acolytehealth-my.sharepoint.com/:f:/p/brad/IgBuYvxx3tCSSaHsL0fnqHraAfW2qMyOC7ixax5vqYzvB6c?e=8O3Ply" target="_blank" rel="noopener">Open the folder in SharePoint</a> (Acolyte sign-in required).</p>
+      </div>
+    </section>
+
+    <section class="script" aria-label="Timestamped script">
+      <div class="tools">
+        <h2>Script</h2>
+        <div class="views" role="group" aria-label="View">
+          <button type="button" id="v-script" aria-pressed="true">Script</button>
+          <button type="button" id="v-changes" aria-pressed="false">Changes<span class="count" id="chg-count" hidden>0</span></button>
+        </div>
+        <label for="follow"><input type="checkbox" id="follow" checked> Follow along</label>
+      </div>
+      <p class="access" id="access">Checking whether you can suggest edits…</p>
+      <div id="phases"></div>
+      <div class="chg" id="changes" hidden>
+        <div class="filters">
+          <label for="f-status">Status</label>
+          <select id="f-status"><option value="all">All</option><option value="pending" selected>Open</option><option value="accepted">Accepted</option><option value="declined">Declined</option></select>
+          <label for="f-who">By</label>
+          <select id="f-who"><option value="all">Everyone</option></select>
+        </div>
+        <div id="chg-list"></div>
+      </div>
+
+      <div class="phase questions" id="qphase">
+        <h3>Open questions <small>Claims to confirm before this goes out</small></h3>
+        <div class="lines" id="qs"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.13/hls.min.js"></script>
+<script>
+(function () {
+  // [line, start s, end s, section, on-screen eyebrow, on-screen headline, narration]
+  var LINES = [[1,0,8.79,"Intro","","","Here's how Acolyte takes a client from intake to enrollment-ready, in one connected workflow, using our demo client, ABC Catering."],[2,9.686,20.91,"Why it matters","","","Today that means spreadsheets, retyped plan data, and weeks of email back and forth. We replace it with one intake, one source of plan data, and one review loop."],[3,21.81,27.79,"Workspace home","Acolyte Workspace","One hub for every client request","It starts in Acolyte Workspace, the associate's hub for client intake, tracking, and support."],[4,28.686,38.29,"Start the intake","Step 1 · Intake","Start a client intake","Pick the client, set the tier and headcount, and choose what they need: open enrollment videos, a digital benefits hub, and an interactive chat agent."],[5,43.105,56.55,"Intake details","Step 1 · Intake","Add the details and current-year documents","Then the details: enrollment dates, branding, the AI persona, and contacts. Attach the current plan year's source documents, like the rate sheet and plan summary, then submit, and the team is notified."],[6,58.288,64.84,"Track it","Step 2 · Track","Every deliverable, tracked","Every deliverable is tracked on the client dashboard, from kickoff through first draft to final approval."],[7,69.173,80.59,"Open Composer","Acolyte Composer","Documents carry over from Workspace","Next, the associate opens Composer to build the first draft. The documents uploaded in Workspace are already on file for ABC Catering, so nothing gets uploaded twice."],[8,81.49,95.96,"Parse","Step 3 · Parse & validate","Plan details, extracted from source documents","Missing something, like a carrier guide? Add it here. No prior benefits guide is required: Composer extracts the plan-level details from rate sheets and plan documents, two hundred sixty-six fields, each linked to its source."],[9,96.858,116.3,"Validate","Step 3 · Parse & validate","Conflicts resolved before anything is generated","Then the associate validates. High-confidence values come pre-confirmed. Where documents disagree, Composer flags the conflict, and the associate picks the right value before anything is generated. Mixing in last year's documents creates exactly these conflicts, so start from the current plan year."],[10,117.197,128.47,"Plan and deliverables","Step 3 · Confirm","Confirm the plan and the deliverables","Next, save the plan structure and confirm the deliverables carried over from the intake. The guide can start right away; the videos and the hub follow, so the numbers stay in sync."],[11,130.607,144.9,"Hi-Res Benefits Guide: edit before print","Step 4 · Hi-Res Benefits Guide","Edit inline, before it prints","First, the Hi-Res Benefits Guide. The layout and wording come from a guide template, not last year's design, with ABC Catering's plan values filled in. Edit any chapter inline, and mark the wording approved."],[12,145.803,154.87,"Stitch and review","Step 4 · Hi-Res Benefits Guide","Stitch, style and review","Then stitch the full guide: page order, shared pages, and the client's colors, with a review list that flags anything missing before you print."],[13,158.241,168.74,"Generate, and edit after print","Step 4 · Hi-Res Benefits Guide","Generate, then edit after print","Generate the print-ready PDF in seconds. Need a change after it prints? Edit the chapter, Composer flags that the PDF is out of date, and you simply generate again."],[14,174.058,185.53,"The videos","Step 5 · OE videos","Twelve chapters, one step","Then the open enrollment videos. Twelve chapters, from medical plans to the 401(k), go to the video engine in one step, each filled with its own plan details."],[15,186.435,195.94,"Video result","Step 5 · OE videos","Open enrollment videos, guided by AI personas","Each chapter becomes a short, mobile-first open enrollment video, with a client or associate AI persona guiding the employee through their choices."],[16,196.837,208.61,"Small script edits","Step 5 · OE videos","Small script edits, typed in","During generation, associates can also type small script edits into any chapter, like adding the client's name, before it renders. Quick customization, without rebuilding the video."],[17,209.508,220.25,"Build the hub","Step 6 · Benefits hub","Built in Acolyte's language and design","With the videos ready, build the digital benefits hub. Pick a template, and Composer builds every page in Acolyte's language and design, filled with the client's plan data."],[18,221.154,228.77,"Edit inline","Step 6 · Benefits hub","Edit inline, see it live","Then edit inline. Change any section, and the live preview updates instantly, on desktop and mobile."],[19,230.468,241.28,"The employee view","Step 6 · Benefits hub","What employees see","This is what employees see: a branded hub for ABC Catering, with enrollment steps, benefit pages, the guide to download, and the open enrollment videos built in."],[20,242.181,259.3,"Review and approve","Step 7 · Review","In-app review and approval","Instead of weeks of email back and forth, clients and associates review right in the app: comment on any page, pause a video to flag the exact moment, then resolve and approve. That saves days on every project, and thousands of hours across the organization."],[21,260.203,271.13,"Real-time analytics","Live · Analytics","Engagement, tracked in real time","Once it's live, engagement is tracked in real time: video views and watch time, survey responses, and every interactive chat conversation, with logs you can download."],[22,274.317,283.7,"Insights for the team","Live · Analytics","Insight for clients, producers and account teams","Associates share the reporting with their clients, and producers and account teams see engagement across every client, ready for sales and renewal conversations."],[23,284.602,293.12,"Close","","","Acolyte AI. From intake to enrollment-ready, in one connected workflow. Learn more at acolyte A I dot com."]];
+  var PHASES = [
+    { key: "open", name: "Opening", note: "Title and why it matters", from: 1, to: 2 },
+    { key: "workspace", name: "Workspace", note: "Intake and tracking", from: 3, to: 6 },
+    { key: "composer", name: "Composer", note: "Parse, validate, guide, videos, hub, review", from: 7, to: 20 },
+    { key: "live", name: "Live", note: "Analytics", from: 21, to: 22 },
+    { key: "close", name: "Close", note: "", from: 23, to: 23 }
+  ];
+  var QUESTIONS = [
+    ["Shared uploads (0:59–1:22)", "The narration says documents uploaded in Workspace are already on file in Composer. The Composer demo doesn't label where its documents came from. Is this how the product works today?"],
+    ["Guide template and data (2:10–2:25)", "The guide editor's source step says the template wording is broker-owned and that pulling values straight from Validation is \"coming next\" (it imports a data file today). The narration says only \"a guide template\" with ABC Catering's plan values. Is that the right framing?"],
+    ["Figures (1:21, 2:40, 4:00)", "\"266 fields,\" \"print-ready PDF in seconds,\" and \"thousands of hours across the organization\" come from the demo or our own estimate. OK to keep?"],
+    ["Script edits mockup (3:16)", "The typed script edit is a mockup on the existing review screen, not a shipped feature. OK to show it this way?"]
+  ];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var fmt = function (t) { t = Math.max(0, Math.floor(t)); return Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0"); };
+  var vid = $("vid");
+  var rows = [];
+
+  // ---- script
+  var phasesEl = $("phases");
+  PHASES.forEach(function (p) {
+    var sec = document.createElement("div"); sec.className = "phase " + p.key;
+    var h = document.createElement("h3"); h.textContent = p.name;
+    if (p.note) { var sm = document.createElement("small"); sm.textContent = p.note; h.appendChild(sm); }
+    var list = document.createElement("div"); list.className = "lines";
+    LINES.filter(function (l) { return l[0] >= p.from && l[0] <= p.to; }).forEach(function (l) {
+      var row = document.createElement("article"); row.className = "ln"; row.id = "line-" + l[0];
+      row.setAttribute("data-comment-target", "");
+      var ts = document.createElement("button"); ts.type = "button"; ts.className = "ts"; ts.textContent = fmt(l[1]);
+      ts.setAttribute("aria-label", "Play from " + fmt(l[1]));
+      ts.addEventListener("click", function () { seek(l[1]); });
+      var body = document.createElement("div"); body.className = "body";
+      var sc = document.createElement("div"); sc.className = "sec"; sc.textContent = "Line " + l[0] + " · " + l[3] + " ";
+      var dur = document.createElement("em"); dur.textContent = "(" + fmt(l[1]) + "–" + fmt(l[2]) + ")"; sc.appendChild(dur);
+      var vo = document.createElement("p"); vo.className = "vo"; vo.textContent = l[6];
+      body.appendChild(sc); body.appendChild(vo);
+      if (l[5]) { var scr = document.createElement("div"); scr.className = "screen"; var b = document.createElement("b"); b.textContent = "On screen: "; scr.appendChild(b); scr.appendChild(document.createTextNode(l[4] + " — " + l[5])); body.appendChild(scr); }
+      var cb = document.createElement("button"); cb.type = "button"; cb.className = "cbtn"; cb.textContent = "Comment";
+      cb.addEventListener("click", function () { comment({ element: row }); });
+      var eb = document.createElement("button"); eb.type = "button"; eb.className = "ebtn"; eb.textContent = "Suggest edit"; eb.hidden = true;
+      eb.addEventListener("click", function () { openEditor(l[0]); });
+      var acts = document.createElement("div"); acts.className = "acts"; acts.appendChild(eb); acts.appendChild(cb);
+      var sugs = document.createElement("div"); sugs.className = "sugs"; sugs.setAttribute("aria-label", "Suggested edits for line " + l[0]);
+      row.appendChild(ts); row.appendChild(body); row.appendChild(acts); row.appendChild(sugs);
+      list.appendChild(row); rows.push({ el: row, l: l, eb: eb, sugs: sugs });
+    });
+    sec.appendChild(h); sec.appendChild(list); phasesEl.appendChild(sec);
+  });
+  var qs = $("qs");
+  QUESTIONS.forEach(function (q, i) {
+    var row = document.createElement("div"); row.className = "q"; row.id = "question-" + (i + 1); row.setAttribute("data-comment-target", "");
+    var p = document.createElement("p"); var b = document.createElement("b"); b.textContent = q[0]; p.appendChild(b); p.appendChild(document.createTextNode(q[1]));
+    var cb = document.createElement("button"); cb.type = "button"; cb.className = "cbtn"; cb.textContent = "Comment";
+    cb.addEventListener("click", function () { comment({ element: row }); });
+    row.appendChild(p); row.appendChild(cb); qs.appendChild(row);
+  });
+
+  // ---- video
+  var src = "video/playlist.txt";
+  if (window.Hls && Hls.isSupported()) { var hls = new Hls({ maxBufferLength: 30 }); hls.loadSource(src); hls.attachMedia(vid); }
+  else { var n = document.createElement("p"); n.style.cssText = "color:#fff;padding:24px;margin:0"; n.textContent = "This browser can't stream the video here. Use the SharePoint link below."; vid.replaceWith(n); }
+  function seek(t) { try { vid.currentTime = t + 0.05; var p = vid.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
+
+  var current = null;
+  function lineAt(t) { var hit = rows[0]; rows.forEach(function (r) { if (t >= r.l[1] - 0.05) hit = r; }); return hit; }
+  function update() {
+    var r = lineAt(vid.currentTime || 0);
+    $("now-tc").textContent = fmt(vid.currentTime || 0);
+    if (r === current) return;
+    if (current) current.el.classList.remove("active");
+    current = r; r.el.classList.add("active");
+    var w = $("now-what"); w.textContent = "Line " + r.l[0] + " · " + r.l[3];
+    var s = document.createElement("span"); s.textContent = r.l[5] ? "On screen: " + r.l[5] : "Narration in progress"; w.appendChild(s);
+    if (!vid.paused && $("follow").checked && window.innerWidth > 960) {
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      r.el.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
+    }
+  }
+  vid.addEventListener("timeupdate", update); vid.addEventListener("seeked", update); update();
+
+  // ---- suggested edits: edits/<viewer id> holds that person's rewrites keyed by line number
+  // ({text, why, at, status: pending|accepted|declined, decidedAt}); the original script never changes.
+  var byLine = {}; rows.forEach(function (r) { byLine[r.l[0]] = r; });
+  var EDITS = {}, ME = null, OWNER = false, CAN = false, DB = null, USER = null, NAMES = {};
+  var writeQ = Promise.resolve();
+  var el = function (tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  var when = function (iso) { try { return new Date(iso).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); } catch (e) { return ""; } };
+  var STATUS = { pending: "Open", accepted: "Accepted", declined: "Declined" };
+
+  // word-level redline: longest common subsequence over words and the spaces between them
+  function redline(a, b, into) {
+    var A = a.match(/\s+|[^\s]+/g) || [], B = b.match(/\s+|[^\s]+/g) || [];
+    var n = A.length, m = B.length, dp = [];
+    for (var i = 0; i <= n; i++) { dp.push(new Array(m + 1).fill(0)); }
+    for (i = n - 1; i >= 0; i--) for (var j = m - 1; j >= 0; j--) dp[i][j] = A[i] === B[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    var ops = []; i = 0; j = 0;
+    var push = function (t, s) { var last = ops[ops.length - 1]; if (last && last.t === t) last.s += s; else ops.push({ t: t, s: s }); };
+    while (i < n && j < m) { if (A[i] === B[j]) { push("=", A[i]); i++; j++; } else if (dp[i + 1][j] >= dp[i][j + 1]) { push("-", A[i++]); } else { push("+", B[j++]); } }
+    while (i < n) push("-", A[i++]); while (j < m) push("+", B[j++]);
+    into.textContent = "";
+    ops.forEach(function (o) { into.appendChild(o.t === "=" ? document.createTextNode(o.s) : el(o.t === "-" ? "del" : "ins", null, o.s)); });
+    return into;
+  }
+
+  function allSugs() {
+    var out = [];
+    Object.keys(EDITS).forEach(function (uid) { var ls = (EDITS[uid] && EDITS[uid].lines) || {};
+      Object.keys(ls).forEach(function (n) { var e = ls[n]; if (e && typeof e.text === "string" && byLine[n]) out.push({ uid: uid, n: +n, e: e }); }); });
+    return out.sort(function (x, y) { return x.n - y.n || String(x.e.at).localeCompare(String(y.e.at)); });
+  }
+
+  function write(fn) { writeQ = writeQ.then(fn).catch(function (e) {
+    toast(e && e.code === "invalid_argument" ? "Your access doesn't allow saving edits here." : "That didn't save. Try again in a moment.");
+    if (e && e.code === "invalid_argument") { CAN = false; access(); render(); } }); return writeQ; }
+  function saveMine(n, text, why) {
+    return write(function () { var cur = JSON.parse(JSON.stringify(EDITS[ME] || { lines: {} })); cur.lines = cur.lines || {};
+      if (text == null) delete cur.lines[n]; else cur.lines[n] = { text: text, why: why || "", at: new Date().toISOString(), status: "pending" };
+      return DB.doc("edits/" + ME).set(cur).then(function () { toast(text == null ? "Suggestion withdrawn." : "Suggestion saved."); }); });
+  }
+  function decide(uid, n, status) {
+    var patch = { lines: {} }; patch.lines[n] = { status: status, decidedAt: new Date().toISOString() };
+    return write(function () { return DB.doc("edits/" + uid).update(patch).then(function () { toast(status === "pending" ? "Reopened." : "Marked " + STATUS[status].toLowerCase() + "."); }); });
+  }
+
+  function card(s, withLine) {
+    var c = el("div", "sug " + (s.e.status || "pending"));
+    var p = NAMES[s.uid] || {}, isMe = s.uid === ME;
+    var who = el("div", "who");
+    if (p.avatarUrl) { var img = document.createElement("img"); img.alt = ""; img.src = p.avatarUrl; who.appendChild(img); }
+    who.appendChild(el("b", null, isMe ? "You" : (p.name || "A reviewer")));
+    who.appendChild(el("span", null, "suggested " + when(s.e.at)));
+    who.appendChild(el("span", "st " + (s.e.status || "pending"), STATUS[s.e.status || "pending"]));
+    if (s.e.decidedAt && s.e.status !== "pending") who.appendChild(el("span", null, "· " + when(s.e.decidedAt)));
+    c.appendChild(who);
+    c.appendChild(redline(byLine[s.n].l[6], s.e.text, el("p", "diff")));
+    if (s.e.why) c.appendChild(el("p", "why", s.e.why));
+    if (withLine) c.appendChild(el("p", "orig", byLine[s.n].l[6]));
+    var own = el("div", "own");
+    if (OWNER) {
+      if (s.e.status !== "accepted") { var a = el("button", "ok", "Accept"); a.type = "button"; a.onclick = function () { decide(s.uid, s.n, "accepted"); }; own.appendChild(a); }
+      if (s.e.status !== "declined") { var d = el("button", "no", "Decline"); d.type = "button"; d.onclick = function () { decide(s.uid, s.n, "declined"); }; own.appendChild(d); }
+      if (s.e.status && s.e.status !== "pending") { var r = el("button", "no", "Reopen"); r.type = "button"; r.onclick = function () { decide(s.uid, s.n, "pending"); }; own.appendChild(r); }
+    }
+    if (isMe && CAN) {
+      var ed = el("button", "ebtn", "Edit mine"); ed.type = "button"; ed.onclick = function () { setView("script"); openEditor(s.n); }; own.appendChild(ed);
+      var w = el("button", "no", "Withdraw"); w.type = "button"; w.onclick = function () { saveMine(s.n, null); }; own.appendChild(w);
+    }
+    if (own.childNodes.length) c.appendChild(own);
+    return c;
+  }
+
+  function render() {
+    var list = allSugs(), ids = Object.keys(EDITS);
+    var draw = function () {
+      rows.forEach(function (r) { r.sugs.textContent = ""; r.el.classList.remove("has-sug"); r.eb.hidden = !CAN;
+        r.eb.textContent = EDITS[ME] && EDITS[ME].lines && EDITS[ME].lines[r.l[0]] ? "Edit my suggestion" : "Suggest edit"; });
+      list.forEach(function (s) { var r = byLine[s.n]; r.sugs.appendChild(card(s, false)); if ((s.e.status || "pending") === "pending") r.el.classList.add("has-sug"); });
+      var open = list.filter(function (s) { return (s.e.status || "pending") === "pending"; }).length;
+      $("chg-count").textContent = open; $("chg-count").hidden = !open;
+      // people filter
+      var fw = $("f-who"), keep = fw.value; fw.textContent = ""; fw.appendChild(new Option("Everyone", "all"));
+      ids.filter(function (u) { return list.some(function (s) { return s.uid === u; }); }).forEach(function (u) { fw.appendChild(new Option(u === ME ? "You" : ((NAMES[u] || {}).name || "A reviewer"), u)); });
+      fw.value = [].some.call(fw.options, function (o) { return o.value === keep; }) ? keep : "all";
+      var fs = $("f-status").value, cl = $("chg-list"); cl.textContent = "";
+      var shown = list.filter(function (s) { return (fs === "all" || (s.e.status || "pending") === fs) && (fw.value === "all" || s.uid === fw.value); });
+      if (!shown.length) cl.appendChild(el("p", "empty", list.length ? "No suggestions match these filters." : "No suggested edits yet. Use Suggest edit on any line to rewrite it."));
+      shown.forEach(function (s) { var it = el("div", "item"), top = el("div", "top"), sec = el("div", "sec");
+        var ts = el("button", "ts", fmt(byLine[s.n].l[1])); ts.type = "button"; ts.setAttribute("aria-label", "Play from " + fmt(byLine[s.n].l[1])); ts.onclick = function () { seek(byLine[s.n].l[1]); };
+        sec.appendChild(ts); sec.appendChild(el("span", null, "Line " + s.n + " · " + byLine[s.n].l[3])); top.appendChild(sec);
+        var go = el("button", "no", "Show in script"); go.type = "button"; go.onclick = function () { setView("script"); byLine[s.n].el.scrollIntoView({ block: "center" }); }; top.appendChild(go);
+        it.appendChild(top); it.appendChild(card(s, true)); cl.appendChild(it); });
+    };
+    if (USER && ids.length) USER.profiles(ids).then(function (p) { NAMES = p || {}; draw(); }, draw); else draw();
+  }
+
+  function openEditor(n) {
+    var r = byLine[n]; if (!r || !CAN) return;
+    var prev = r.el.querySelector(".editor"); if (prev) { prev.querySelector("textarea").focus(); return; }
+    var mine = EDITS[ME] && EDITS[ME].lines && EDITS[ME].lines[n];
+    var box = el("div", "editor");
+    var lab = el("label", null, "Your version of line " + n); lab.htmlFor = "edit-" + n;
+    var ta = document.createElement("textarea"); ta.id = "edit-" + n; ta.maxLength = 2000; ta.value = mine ? mine.text : r.l[6];
+    var wl = el("label", null, "Why (optional)"); wl.htmlFor = "why-" + n;
+    var why = document.createElement("input"); why.id = "why-" + n; why.maxLength = 500; why.value = mine ? mine.why || "" : ""; why.placeholder = "e.g. clearer for HR buyers";
+    var prevw = el("p", "diff"), hint = el("span", "hint", "Preview of your change:");
+    var upd = function () { redline(r.l[6], ta.value.trim(), prevw); };
+    ta.addEventListener("input", upd); upd();
+    var row = el("div", "row"), save = el("button", "primary", "Save suggestion"), cancel = el("button", "no", "Cancel");
+    save.type = cancel.type = "button";
+    save.onclick = function () { var t = ta.value.replace(/\s+/g, " ").trim();
+      if (!t) { toast("Write your version first, or use Cancel."); return; }
+      if (t === r.l[6]) { toast("That matches the current line. Change some words first."); return; }
+      save.disabled = true; saveMine(n, t, why.value.trim()).then(function () { box.remove(); }); };
+    cancel.onclick = function () { box.remove(); };
+    row.appendChild(save); row.appendChild(cancel);
+    [lab, ta, wl, why, hint, prevw, row].forEach(function (x) { box.appendChild(x); });
+    r.el.insertBefore(box, r.sugs); ta.focus();
+  }
+
+  function setView(v) { var ch = v === "changes";
+    $("v-script").setAttribute("aria-pressed", String(!ch)); $("v-changes").setAttribute("aria-pressed", String(ch));
+    $("phases").hidden = ch; $("qphase").hidden = ch; $("changes").hidden = !ch; }
+  $("v-script").onclick = function () { setView("script"); };
+  $("v-changes").onclick = function () { setView("changes"); };
+  $("f-status").onchange = render; $("f-who").onchange = render;
+
+  function access() {
+    var a = $("access");
+    if (!DB || !ME) a.textContent = "Sign in to claude.ai with access to this page to suggest edits. You can still watch and comment.";
+    else if (OWNER) a.textContent = "You own this page. Reviewers' rewrites show under each line and in Changes, where you can accept or decline them.";
+    else if (!CAN) a.textContent = "You can comment. To suggest rewrites, ask the page owner for Contributor access.";
+    else a.textContent = "Rewrite any line with Suggest edit. Your version is saved with your name as a redline; the original stays unchanged.";
+  }
+  render();
+  Promise.all([
+    window.claude && window.claude.use ? window.claude.use("db") : null,
+    window.claude && window.claude.use ? window.claude.use("user") : null
+  ]).then(function (res) {
+    DB = res[0]; USER = res[1];
+    if (!DB || !USER) { access(); return; }
+    return Promise.all([USER.id(), USER.isOwner(), USER.can("data.write")]).then(function (v) {
+      ME = v[0]; OWNER = v[1]; CAN = !!ME && v[2] !== false; access();
+      DB.collection("edits").onSnapshot(function (snap) { var next = {}; snap.docs.forEach(function (d) { next[d.id] = d.data(); }); EDITS = next; render(); },
+        function () { access(); });
+    });
+  }).catch(function () { access(); });
+
+  // ---- comments (the shell's own composer; threads are shown by claude.ai, not the page)
+  var commentsP = window.claude && window.claude.use ? window.claude.use("comments") : Promise.resolve(null);
+  var toastT;
+  function toast(msg) { var t = document.querySelector(".toast"); if (!t) { t = document.createElement("div"); t.className = "toast"; t.setAttribute("role", "status"); document.body.appendChild(t); } t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, 4200); }
+  function comment(target) {
+    commentsP.then(function (c) {
+      if (!c) { toast("Commenting isn't available in this view. Open the page in claude.ai with comment access."); return; }
+      return c.openComposer(target).then(function (r) {
+        if (r && !r.opened) toast("Finish or close the comment you have open first.");
+      }, function (e) {
+        toast(e && e.code === "rate_limited" ? "One moment, then try again." : "Commenting isn't available in this view.");
+      });
+    });
+  }
+  $("comment-now").addEventListener("click", function () { vid.pause(); comment({ element: (current || rows[0]).el }); });
+
+  // select words in the script, then comment on just that phrase
+  var sel = document.createElement("button"); sel.type = "button"; sel.className = "primary selbtn"; sel.textContent = "Comment on selection"; sel.hidden = true; document.body.appendChild(sel);
+  var lastRange = null;
+  document.addEventListener("selectionchange", function () {
+    var s = document.getSelection();
+    if (!s || s.isCollapsed || !s.rangeCount) { setTimeout(function () { if (document.getSelection().isCollapsed) sel.hidden = true; }, 150); return; }
+    var r = s.getRangeAt(0); var node = r.commonAncestorContainer; var el = node.nodeType === 1 ? node : node.parentElement;
+    if (!el || !el.closest(".ln, .q")) { sel.hidden = true; return; }
+    lastRange = r.cloneRange();
+    var b = r.getBoundingClientRect();
+    sel.style.top = (b.bottom + window.scrollY + 8) + "px";
+    sel.style.left = Math.max(16, Math.min(b.left + window.scrollX, document.documentElement.clientWidth - 200)) + "px";
+    sel.hidden = false;
+  });
+  sel.addEventListener("mousedown", function (e) { e.preventDefault(); });
+  sel.addEventListener("click", function () { if (lastRange) comment({ range: lastRange }); sel.hidden = true; });
+})();
+</script>
+
+</body></html>
